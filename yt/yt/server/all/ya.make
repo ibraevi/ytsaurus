@@ -13,7 +13,7 @@ SRCS(
 )
 
 PEERDIR(
-    yt/yt/library/query/engine
+    yt/yt/library/query/enginebrokenbuild
     yt/yt/library/query/row_comparer
 
     yt/yt/server/cell_balancer
