@@ -1,4 +1,4 @@
-name: Build PR
+name: Check PR
 on:
   workflow_call:
     inputs:
@@ -147,10 +147,3 @@ jobs:
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           label: ${{ needs.start-vm.outputs.label }}
           instance-id: ${{ needs.start-vm.outputs.instance-id }}
-
-  build: 
-    name: Build
-    runs-on: trampoline
-    steps:
-      - name: Echo Build Success
-        run: echo "Build success"
