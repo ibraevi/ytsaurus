@@ -112,7 +112,7 @@ jobs:
     uses: ./.github/workflows/build-jobs.yaml
 
   build-ya-make:
-    name: Build
+    name: Build with ya-make
     needs:
       - start-vm
       - checkout
@@ -120,12 +120,9 @@ jobs:
     with:
       runs-on-value: ${{ needs.start-vm.outputs.label }}
       cpp-build-system: ya-make
-      build-python: true
-      skip-python-packages: true
       build-ytsaurus: true
-      build-query-tracker: true
-      build-yql-python-udfs: false
-      update-remote-cache: false
+      build-query-tracker: ${{ github.ref_name == 'main' }}
+      build-python: true
     secrets:
       YA_YT_TOKEN: ${{ secrets.YA_YT_TOKEN }}
     uses: ./.github/workflows/build-jobs.yaml
