@@ -95,7 +95,7 @@ jobs:
   #     build-python: true
   #     skip-python-packages: true
   #     build-ytsaurus: true
-  #     build-query-tracker: false
+  #     build-query-tracker: true
   #     build-yql-python-udfs: false
   #     update-remote-cache: false
   #   secrets:
