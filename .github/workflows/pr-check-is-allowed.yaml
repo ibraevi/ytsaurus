@@ -190,6 +190,6 @@ jobs:
       GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
       YC_VM_USERNAME: ${{ secrets.YC_VM_USERNAME }}
       YC_VM_SSH_PUBLIC_KEY: ${{ secrets.YC_VM_SSH_PUBLIC_KEY }}
-    uses: ./.github/workflows/build-pr.yaml
+    uses: ./.github/workflows/pr-check.yaml
     with:
       commit-sha: ${{ needs.check-running-allowed.outputs.commit_sha }}
