@@ -1,14 +1,15 @@
-name: Check PR (build)
+name: Check PR
 
 on:
   pull_request_target:
     branches:
-      - "main"
+      - main
+      - stable/[0-9]+\.[0-9]+
     types:
-      - "opened"
-      - "synchronize"
-      - "reopened"
-      - "labeled"
+      - opened
+      - synchronize
+      - reopened
+      - labeled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -19,7 +20,7 @@ env:
 
 jobs:
   check-running-allowed:
-    name: Check if PR it is allowed to run workflow
+    name: Check if running checks is allowed for the PR
     if: ${{ vars.CHECK_PR == 'true' }}
     runs-on: trampoline
     outputs:
@@ -75,11 +76,14 @@ jobs:
         with:
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           script: |
+
+            const message = 'Hi! Thank you for your contribution!\n\nA member of YTsaurus team will review your changes soon, add "ok-to-test" label and tests will be run.';
+
             github.rest.issues.createComment({
               owner: context.payload.repository.owner.login,
               repo: context.payload.repository.name,
               issue_number: context.payload.pull_request.number,
-              body: 'Thank you for your contribution to the development! The auto-check of the changes you have made will begin after the internal developer checks the changes you have made and adds the "ok-to-test" label to this PR.',
+              body: message,
             });
 
             github.rest.issues.addLabels({
@@ -89,7 +93,7 @@ jobs:
               labels: ['external'],
             });
 
-      - name: Remove label 'ok-to-test' if PR
+      - name: Remove label 'ok-to-test' if PR is labeled with it
         uses: actions/github-script@v7
         if: ${{ steps.check-ok-to-test.outputs.result == 'true' }}
         with:
@@ -113,17 +117,14 @@ jobs:
             const maxAttempts = 60;
 
             let prData = context.payload.pull_request;
-            
-            const header = `<!-- merge pr=${prData.number} -->\n`;
-            const failureMessage = header + ':red_circle: Unable to merge your PR into the target branch. Please ensure it is rebased or merged with the target branch.'
-            
             let attempt = 0;
 
             while (prData.mergeable === null && attempt < maxAttempts) {
               console.log("Fetching PR status...");
 
               let result = await github.rest.pulls.get({
-                ...context.repo,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
                 pull_number: prData.number
               })
 
@@ -140,47 +141,13 @@ jobs:
               core.setFailed("Failed to determine if the PR is mergeable, please try again later.");
               return false;
             }
-
             console.log("pr.mergeable=%o", prData.mergeable);
-
-            const { data: existingComments } = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-
-            const commentToUpdate = existingComments.find(comment => comment.body.startsWith(header));
-
-            if (!prData.mergeable) {
-              let commentDetails = {
-                ...context.repo,
-                issue_number: context.issue.number,
-                body: failureMessage
-              };
-
-              if (commentToUpdate) {
-                await github.rest.issues.updateComment({
-                  ...commentDetails,
-                  comment_id: commentToUpdate.id,
-                });
-              } else {
-                await github.rest.issues.createComment({ ...commentDetails });
-              }
-              core.setFailed("Merge conflict found");
-              return false;
-            } else if (commentToUpdate) {
-              await github.rest.issues.deleteComment({
-                ...context.repo,
-                issue_number: context.issue.number,
-                comment_id: commentToUpdate.id,
-              });
-            }
             core.info(`commit_sha=${prData.merge_commit_sha}`);
             core.setOutput('commit_sha', prData.merge_commit_sha);
             return true;
 
-  build-pr:
-    name: Build PR
+  check-pr:
+    name: Check PR
     needs:
       - check-running-allowed
     if: needs.check-running-allowed.outputs.result == 'true' && needs.check-running-allowed.outputs.commit_sha != ''
