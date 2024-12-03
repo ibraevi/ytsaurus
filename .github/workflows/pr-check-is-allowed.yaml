@@ -51,10 +51,10 @@ jobs:
           script: |
             const prAuthor = context.payload.pull_request.user.login;
 
-            if (prAuthor == context.payload.repository.owner.login) {
-              console.log("Author of PR is owner of repository");
-              return true;
-            }
+            // if (prAuthor == context.payload.repository.owner.login) {
+            //   console.log("Author of PR is owner of repository");
+            //   return true;
+            // }
 
             isColaborator = false;
 
@@ -64,6 +64,7 @@ jobs:
                 team_slug: `yt-team`,
                 username: prAuthor
               });
+              console.log(checkMembershipResponse);
               return checkCollaboratorResponse.status == 204;
             } catch (error) {
               console.log("Error checking if author of PR is collaborator: " + error);
