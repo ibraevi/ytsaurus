@@ -64,9 +64,12 @@ jobs:
                 team_slug: `yt-team`,
                 username: prAuthor
               });
-              console.log(checkMembershipResponse);
-              return false;
-              return checkMembershipResponse.status == 204;
+              if (checkMembershipResponse.status == 200 &&
+                checkMembershipResponse.data.state == 'active' && 
+                (checkMembershipResponse.data.role == 'member' || 
+                checkMembershipResponse.data.role == 'maintainer') {
+                  return true;
+                }
             } catch (error) {
               console.log("Error checking if author of PR is collaborator: " + error);
             }
