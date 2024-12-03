@@ -21,7 +21,7 @@ env:
 jobs:
   check-running-allowed:
     name: Check if running checks is allowed for the PR
-    if: ${{ vars.CHECK_PR == 'true' }}
+    if: ${{ vars.RUN_PR_CHECK == 'true' }}
     runs-on: trampoline
     outputs:
       result: ${{ steps.check-pr-is-mergeable.outputs.result == 'true' }}
@@ -93,7 +93,7 @@ jobs:
               labels: ['external'],
             });
 
-      - name: Remove label 'ok-to-test' if PR is labeled with it
+      - name: Remove label 'ok-to-test'
         uses: actions/github-script@v7
         if: ${{ steps.check-ok-to-test.outputs.result == 'true' }}
         with:
