@@ -65,7 +65,8 @@ jobs:
                 username: prAuthor
               });
               console.log(checkMembershipResponse);
-              return checkCollaboratorResponse.status == 204;
+              return false;
+              return checkMembershipResponse.status == 204;
             } catch (error) {
               console.log("Error checking if author of PR is collaborator: " + error);
             }
