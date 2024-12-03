@@ -59,10 +59,10 @@ jobs:
             isColaborator = false;
 
             try {
-              const checkCollaboratorResponse = await github.rest.repos.checkCollaborator({
-                owner: context.payload.repository.owner.login,
-                repo: context.payload.repository.name,
-                username: prAuthor,
+              const checkMembershipResponse = await github.rest.teams.getMembershipForUserInOrg({
+                org: `ytsaurus`,
+                team_slug: `yt-team`,
+                username: prAuthor
               });
               return checkCollaboratorResponse.status == 204;
             } catch (error) {
